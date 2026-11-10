@@ -1,0 +1,7 @@
+{
+  "appId": "com.shefra.alsirat",
+  "appName": "الصراط المستقيم",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false }
+}
