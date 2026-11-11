@@ -178,6 +178,39 @@ os.makedirs(vals, exist_ok=True)
 open(os.path.join(vals, "ic_launcher_background.xml"), "w").write(
     '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#0B2A38</color>\n</resources>\n')
 print("icons generated in", RES)
+
+# ---- splash screen: replace Capacitor's default splash images ----
+import glob
+
+def gradient_wh(w, h):
+    g = Image.new("RGBA", (w, h))
+    px = g.load()
+    for y in range(h):
+        t = y / max(1, h - 1)
+        col = tuple(int(BG1[i] + (BG2[i] - BG1[i]) * t) for i in range(3)) + (255,)
+        for x in range(w):
+            px[x, y] = col
+    return g
+
+def render_splash(w, h):
+    A = int(min(w, h) * 0.62)
+    S = A * SS
+    layer = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    art(layer, S, S * 0.46, True)
+    layer = layer.resize((A, A), Image.LANCZOS)
+    bg = gradient_wh(w, h)
+    bg.alpha_composite(layer, ((w - A) // 2, (h - A) // 2))
+    return bg
+
+found = 0
+for p in glob.glob(os.path.join(RES, "**", "splash.png"), recursive=True):
+    try:
+        w, h = Image.open(p).size
+        render_splash(w, h).convert("RGB").save(p)
+        found += 1
+    except Exception as e:
+        print("splash skip", p, e)
+print("splash images replaced:", found)
 PYEOF
 
 echo "==> 6) sync and build"
